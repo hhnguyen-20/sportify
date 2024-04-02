@@ -5,10 +5,8 @@ from api import API
 from search_result import display_data
 from position import center
 
-path = "/team"
 
-
-def call_data(team_code):
+def call_team_data(team_code):
     url = "https://api-nba-v1.p.rapidapi.com/teams"
     querystring = {"code": team_code}
     headers = {
@@ -23,7 +21,7 @@ def search():
     team_code = search_entry.get().strip().upper()  # Assuming the team code is entered and should be uppercase
     if team_code:  # Check if the entry is not empty
         # Run the API call and data display in a separate thread to avoid freezing the GUI
-        threading.Thread(target=lambda: display_data(root, call_data(team_code))).start()
+        threading.Thread(target=lambda: display_data(root, call_team_data(team_code))).start()
     else:
         print("Please enter a team code.")
 

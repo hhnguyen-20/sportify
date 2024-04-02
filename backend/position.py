@@ -1,5 +1,5 @@
 def center(root):
-    window_width = 700
+    window_width = 800
     window_height = 600
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
