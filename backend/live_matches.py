@@ -15,10 +15,23 @@ def call_live_game_data():
         "X-RapidAPI-Host": "api-nba-v1.p.rapidapi.com"
     }
     response = requests.get(url, headers=headers, params=querystring)
-    print(response.json())
+    return response.json()
+
 
 def format_data(response):
-    pass
+    if response['results'] == 0:
+        print("There are no live matches currently.")
+    else:
+        print(response)
+
 
 def display_data(gameList):
     pass
+
+
+def main():
+    live_games_json = call_live_game_data()
+    format_data(live_games_json)
+
+
+main()
