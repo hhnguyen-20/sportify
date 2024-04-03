@@ -63,7 +63,8 @@ def display_data(root, team):
     """Logo"""
     # Load the image from the URL
     response = requests.get(team_info['logo'])
-    photo = ImageTk.PhotoImage(Image.open(BytesIO(response.content)).resize((50, 50)))
+    image = Image.open(BytesIO(response.content))
+    photo = ImageTk.PhotoImage(image.resize((50, 50)))
 
     # Display the image in the window
     logo = tk.Label(search_window, image=photo)
