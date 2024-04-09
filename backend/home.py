@@ -2,9 +2,10 @@ import threading
 import tkinter as tk
 import requests
 from api import API
+from tkinter import messagebox
 from search_result import display_data
 from position import center
-
+from show_fav import show_favorites
 
 def call_team_data(team_code):
     url = "https://api-nba-v1.p.rapidapi.com/teams"
@@ -16,15 +17,19 @@ def call_team_data(team_code):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
-
 def search():
     team_code = search_entry.get().strip().upper()  # Assuming the team code is entered and should be uppercase
     if team_code:  # Check if the entry is not empty
         # Run the API call and data display in a separate thread to avoid freezing the GUI
         threading.Thread(target=lambda: display_data(root, call_team_data(team_code))).start()
+    elif team_code == "Enter a team name...":
+        messagebox.showerror("showerror", "Error") 
     else:
-        print("Please enter a team code.")
+        messagebox.showerror("showerror", "Error") 
 
+def show():
+    threading.Thread(target=lambda: show_favorites(root)).start()
+    
 
 # Create a Tkinter window
 root = tk.Tk()
@@ -48,7 +53,7 @@ search_entry.grid(row=0, column=1)
 search_button = tk.Button(frame_1, text="Search", command=search)
 search_button.grid(row=0, column=2)
 
-fav_button = tk.Button(frame_1, text="Favorite Team", command=lambda: print("Favorite Team"))
+fav_button = tk.Button(frame_1, text="Favorite Team", command=show)
 fav_button.grid(row=0, column=3)
 
 tk.Label(root, text="").pack()  # empty space
