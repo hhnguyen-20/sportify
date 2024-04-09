@@ -1,14 +1,17 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
+import urllib.request as req
 from PIL import Image, ImageTk
-from io import BytesIO
 import requests
 from position import center
 from api import API
 
+favorite_teams = []  # Global list to store favorite teams
 
-def call_game_data(team_id, season):
-    url = "https://api-nba-v1.p.rapidapi.com/games"
+"""
+Function to call the API data
+"""
+def call_api_data(url, team_id, season):
     querystring = {"team": str(team_id), "season": str(season)}
     headers = {
         "X-RapidAPI-Key": API,
@@ -17,17 +20,52 @@ def call_game_data(team_id, season):
     response = requests.get(url, headers=headers, params=querystring)
     return response.json()
 
+"""
+Function to update the game and player based on the selected season
+"""
+def update_info(season_combobox, team_info, frame_game, frame_player):
+    season_selected = season_combobox.get()
+    game_data = call_api_data("https://api-nba-v1.p.rapidapi.com/games", team_info['id'], season_selected)
+    player_data = call_api_data("https://api-nba-v1.p.rapidapi.com/players", team_info['id'], season_selected)
+    
+    # Update game info
+    formatted_game_info = "\n".join(
+        f"{g['teams']['home']['name']} vs. {g['teams']['visitors']['name']}, "
+        f"Score: {g['scores']['home']['points']} - {g['scores']['visitors']['points']}, "
+        f"Date: {g['date']['start'][:10]}, Arena: {g['arena']['city']}"
+        for g in game_data['response'][:5]
+    )
+    for widget in frame_game.winfo_children():
+        widget.destroy()
 
-def call_player_data(team_id, season):
-    url = "https://api-nba-v1.p.rapidapi.com/players"
-    querystring = {"team": str(team_id), "season": str(season)}
-    headers = {
-        "X-RapidAPI-Key": API,
-        "X-RapidAPI-Host": "api-nba-v1.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    return response.json()
+    # Displaying the formatted information
+    game_title = tk.Label(frame_game, text="GAMES")
+    game_title.grid(row=0, column=0, sticky="w")
+    formatted_game_info_label = tk.Label(frame_game, text=formatted_game_info, justify=tk.LEFT)
+    formatted_game_info_label.grid(row=1, column=0, sticky="w")
+    
+    # Update player info
+    formatted_player_info = "\n".join(
+        f"{p['firstname']} {p['lastname']}, Jersey: {p['leagues']['standard']['jersey']}, "
+        f"Position: {p['leagues']['standard']['pos']}, Height: {p['height']['meters']} m, "
+        f"Weight: {p['weight']['kilograms']} kg"
+        for p in player_data['response'][:5]
+    )
+    for widget in frame_player.winfo_children():
+        widget.destroy()
 
+    # Displaying the formatted information
+    player_title = tk.Label(frame_player, text="PLAYERS")
+    player_title.grid(row=0, column=0, sticky="w")
+    formatted_player_info_label = tk.Label(frame_player, text=formatted_player_info, justify=tk.LEFT)
+    formatted_player_info_label.grid(row=1, column=0, sticky="w")
+
+def add_to_favorites(team_id, team_name):
+    if team_id not in favorite_teams:
+        favorite_teams.append(team_name)
+        messagebox.showinfo("Success", f"{team_name} added to favorites!")
+    else:
+        messagebox.showinfo("Info", f"{team_name} is already in your favorites.")
 
 def display_data(root, team):
     search_window = tk.Toplevel(root)
@@ -62,10 +100,9 @@ def display_data(root, team):
 
     """Logo"""
     # Load the image from the URL
-    response = requests.get(team_info['logo'])
-    image = Image.open(BytesIO(response.content))
-    photo = ImageTk.PhotoImage(image.resize((50, 50)))
-
+    req.urlretrieve(team_info['logo'], "logo.png")
+    photo = ImageTk.PhotoImage(Image.open("logo.png").resize((50, 50)))
+    
     # Display the image in the window
     logo = tk.Label(search_window, image=photo)
     logo.image = photo
@@ -78,6 +115,9 @@ def display_data(root, team):
     team_title = tk.Label(frame_team, text="TEAM")
     team_title.grid(row=0, column=0, sticky="w")
 
+    fav_button = tk.Button(frame_team, text="⭐️", command=lambda: add_to_favorites(team_info['id'], team_info['name']))
+    fav_button.grid(row=0, column=1)
+
     # Formatting the information to be displayed
     formatted_team_info = f"Name: {team_info['name']}\n" \
                           f"Nickname: {team_info['nickname']}\n" \
@@ -88,13 +128,13 @@ def display_data(root, team):
 
     # Displaying the formatted information
     formatted_team_info_label = tk.Label(frame_team, text=formatted_team_info, justify=tk.LEFT)
-    formatted_team_info_label.grid(row=1, column=0, sticky="w")
+    formatted_team_info_label.grid(row=1, column=0, sticky="w", columnspan=2)
 
     """Season"""
-    seasons = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015']
-
     frame_season = tk.Frame(search_window)
     frame_season.pack(pady=10)
+
+    seasons = ['2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015']
 
     season_title = tk.Label(frame_season, text="Select a season:")
     season_title.grid(row=0, column=0)
@@ -102,43 +142,16 @@ def display_data(root, team):
     season_combobox.grid(row=0, column=1)
     season_combobox.current(0)
 
-    season_selected = season_combobox.get()
-
     """Frame game"""
     frame_game = tk.Frame(search_window, bd=1, relief="solid")
     frame_game.pack(side="top", fill="x", padx=90, pady=10)
-
-    game_title = tk.Label(frame_game, text="GAMES")
-    game_title.grid(row=0, column=0, sticky="w")
-
-    game = call_game_data(team_info['id'], season_selected)
-    formatted_game_info = ""
-    for game_info in game['response'][:5]:
-        formatted_game_info += f"{game_info['teams']['home']['name']} vs. {game_info['teams']['visitors']['name']}, " \
-                              f"Score: {game_info['scores']['home']['points']} - {game_info['scores']['visitors']['points']}, " \
-                              f"Date: {game_info['date']['start'][:10]}, " \
-                              f"Arena: {game_info['arena']['city']}\n"
-
-    # Displaying the formatted information
-    formatted_game_info_label = tk.Label(frame_game, text=formatted_game_info, justify=tk.LEFT)
-    formatted_game_info_label.grid(row=1, column=0, sticky="w")
 
     """Frame player"""
     frame_player = tk.Frame(search_window, bd=1, relief="solid")
     frame_player.pack(side="top", fill="x", padx=90, pady=10)
 
-    player_title = tk.Label(frame_player, text="PLAYERS")
-    player_title.grid(row=0, column=0, sticky="w")
+    # Initial display
+    update_info(season_combobox, team_info, frame_game, frame_player)
 
-    player = call_player_data(team_info['id'], season_selected)
-    formatted_player_info = ""
-    for player_info in player['response'][:5]:
-        formatted_player_info += f"{player_info['firstname']} {player_info['lastname']}, " \
-                                 f"Jersey: {player_info['leagues']['standard']['jersey']}, " \
-                                 f"Position: {player_info['leagues']['standard']['pos']}, " \
-                                 f"Height: {player_info['height']['meters']} m, " \
-                                 f"Weight: {player_info['weight']['kilograms']} kg\n"
-
-    # Displaying the formatted information
-    formatted_player_info_label = tk.Label(frame_player, text=formatted_player_info, justify=tk.LEFT)
-    formatted_player_info_label.grid(row=1, column=0, sticky="w")
+    # Bind the combobox selection event
+    season_combobox.bind("<<ComboboxSelected>>", lambda event: update_info(season_combobox, team_info, frame_game, frame_player))
