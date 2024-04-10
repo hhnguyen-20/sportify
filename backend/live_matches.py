@@ -5,11 +5,14 @@ from io import BytesIO
 import requests
 from position import center
 from api import API
+from datetime import date
+import pprint
 
 
 def call_live_game_data():
     url = "https://api-nba-v1.p.rapidapi.com/games"
-    querystring = {'live': 'all'}
+    today = str(date.today())
+    querystring = {'date': today}
     headers = {
         "X-RapidAPI-Key": API,
         "X-RapidAPI-Host": "api-nba-v1.p.rapidapi.com"
@@ -53,7 +56,7 @@ def format_data(response):
     if live_match_count == 0:
         print("There are no live matches currently.")
     for match in response['response']:
-        formatted_string = (f"Q{match['periods']['current']}   {match['status']['clock']}      {match['teams']['visitors']['name']}   {match['scores']['visitors']['points']}     vs.     {match['scores']['home']['points']}   {match['teams']['home']['name']}      {match['arena']['name']}      {match['arena']['city']}, {match['arena']['state']}")
+        formatted_string = f"Q{match['periods']['current']}   {match['status']['clock']}      {match['teams']['visitors']['name']}   {match['scores']['visitors']['points']}     vs.     {match['scores']['home']['points']}   {match['teams']['home']['name']}      {match['arena']['name']}      {match['arena']['city']}, {match['arena']['state']}"
         formatted_live_matches.append(formatted_string)
     return formatted_live_matches
 
@@ -63,9 +66,10 @@ def display_data(gameList):
 
 def main():
     live_games_json = call_live_game_data()
-    match_strings = format_data(live_games_json)
-    for match_str in match_strings:
-        print(match_str)
+    pprint.pp(live_games_json, indent=2)
+    # match_strings = format_data(live_games_json)
+    # for match_str in match_strings:
+    #     print(match_str)
 
 
 if __name__ == '__main__':
