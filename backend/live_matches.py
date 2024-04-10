@@ -102,12 +102,12 @@ def display_data(gameList):
 
 def main():
     today_games_json, live_games_json = call_live_game_data()
-    # pprint.pprint(today_games_json, indent=2)
-    # pprint.pprint(live_games_json, indent=2)
     live_matches = format_live_game_data(live_games_json)
     today_matches = format_today_game_data(today_games_json)
-    pprint.pprint(live_matches, indent=2)
-    pprint.pprint(today_matches, indent=2)
+    pprint.pprint(today_games_json)
+    # print(len(live_matches), len(today_matches))
+    # pprint.pprint(live_matches, indent=2)
+    # pprint.pprint(today_matches, indent=2)
 
 
 if __name__ == '__main__':
