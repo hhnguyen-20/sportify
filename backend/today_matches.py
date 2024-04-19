@@ -9,7 +9,7 @@ from datetime import date
 import pprint
 
 
-def call_live_game_data():
+def call_game_data():
     url = "https://api-nba-v1.p.rapidapi.com/games"
     today = str(date.today())
     today_querystring = {'date': today}
@@ -88,6 +88,8 @@ def format_today_game_data(today_response):
     if today_match_count == 0:
         print("There are no matches going on today")
     for match in today_response['response']:
+        if match['status']['long'] == 'In Play':
+            continue
         formatted_data = [str(date.today()), match['teams']['visitors']['name'],
                           match['scores']['visitors']['points'], 'vs.', match['scores']['home']['points'],
                           match['teams']['home']['name'], match['arena']['name'], match['arena']['city'], ',',
@@ -96,18 +98,30 @@ def format_today_game_data(today_response):
     return formatted_today_matches
 
 
-def display_data(gameList):
-    pass
+def create_live_game_strings(game_list):
+    game_strings = []
+    for game in game_list:
+        game_strings.append(f"""Q{game[0]}-{game[1]}   {game[2]}  {game[3]}  {game[4]}  {game[5]}  {game[6]}   {game[7]}  {game[8]}{game[9]} {game[10]}""")
+    return game_strings
 
 
+def create_today_game_strings(game_list):
+    game_strings = []
+    for game in game_list:
+        game_strings.append(f"""{game[0]}  {game[1]}  {game[2]}  {game[3]}  {game[4]}  {game[5]}   {game[6]}  {game[7]}{game[8]} {game[9]}""")
+    return game_strings
 def main():
-    today_games_json, live_games_json = call_live_game_data()
+    today_games_json, live_games_json = call_game_data()
     live_matches = format_live_game_data(live_games_json)
     today_matches = format_today_game_data(today_games_json)
-    pprint.pprint(today_games_json)
+    live_str = create_live_game_strings(live_matches)
+    today_str = create_today_game_strings(today_matches)
+    # pprint.pprint(today_games_json)
     # print(len(live_matches), len(today_matches))
     # pprint.pprint(live_matches, indent=2)
     # pprint.pprint(today_matches, indent=2)
+    pprint.pprint(live_str)
+    pprint.pprint(today_str)
 
 
 if __name__ == '__main__':

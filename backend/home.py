@@ -6,6 +6,7 @@ from tkinter import messagebox
 from search_result import display_data
 from position import center
 from show_fav import show_favorites
+import today_matches
 
 def call_team_data(team_code):
     url = "https://api-nba-v1.p.rapidapi.com/teams"
@@ -59,12 +60,20 @@ fav_button.grid(row=0, column=3)
 tk.Label(root, text="").pack()  # empty space
 
 """Frame 2"""
+today_json, live_json = today_matches.call_game_data()
+live_games = today_matches.format_live_game_data(live_json)
+today_games = today_matches.format_today_game_data(today_json)
+live_text = today_matches.create_live_game_strings(live_games)
+today_text = today_matches.create_today_game_strings(today_games)
 frame_2 = tk.Frame(root, bd=1, relief="solid")
 frame_2.pack()
-
-# displays today's live matches with scores
-live_matches = tk.Label(frame_2, text="Live Matches", width=70, height=10)
-live_matches.pack()
+for text in live_text:
+    tk.Label(frame_2, text=text, bg='white', fg='black', width=80, height=2).pack()
+for text in today_text:
+    tk.Label(frame_2, text=text, bg='white', fg='black', width=80, height=2).pack()
+# # displays today's live matches with scores
+# live_matches = tk.Label(frame_2, text="Live Matches", width=70, height=10)
+# live_matches.pack()
 
 tk.Label(root, text="").pack()  # empty space
 
