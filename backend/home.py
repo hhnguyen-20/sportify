@@ -63,14 +63,27 @@ tk.Label(root, text="").pack()  # empty space
 today_json, live_json = today_matches.call_game_data()
 live_games = today_matches.format_live_game_data(live_json)
 today_games = today_matches.format_today_game_data(today_json)
-live_text = today_matches.create_live_game_strings(live_games)
-today_text = today_matches.create_today_game_strings(today_games)
-frame_2 = tk.Frame(root, bd=1, relief="solid")
+frame_2 = tk.Frame(root, bd=1, relief="solid", bg='white')
 frame_2.pack()
-for text in live_text:
-    tk.Label(frame_2, text=text, bg='white', fg='black', width=80, height=2).pack()
-for text in today_text:
-    tk.Label(frame_2, text=text, bg='white', fg='black', width=80, height=2).pack()
+row = 0
+for text in live_games:
+    game_frame = tk.Frame(frame_2, bg='white', bd=1)
+    col = 0
+    for feature in text:
+        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=14, height=2, padx=5)
+        feature_label.grid(row=row, column=col, pady=5)
+        col += 1
+    row += 1
+    game_frame.pack()
+for text in today_games:
+    game_frame = tk.Frame(frame_2, bg='white', bd=1)
+    col = 0
+    for feature in text:
+        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=14, height=2, padx=5)
+        feature_label.grid(row=row, column=col, pady=5)
+        col += 1
+    row += 1
+    game_frame.pack()
 # # displays today's live matches with scores
 # live_matches = tk.Label(frame_2, text="Live Matches", width=70, height=10)
 # live_matches.pack()
