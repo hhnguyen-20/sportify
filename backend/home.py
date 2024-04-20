@@ -70,7 +70,7 @@ for text in live_games:
     game_frame = tk.Frame(frame_2, bg='white', bd=1)
     col = 0
     for feature in text:
-        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=14, height=2, padx=5)
+        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=20, height=2)
         feature_label.grid(row=row, column=col, pady=5)
         col += 1
     row += 1
@@ -79,7 +79,7 @@ for text in today_games:
     game_frame = tk.Frame(frame_2, bg='white', bd=1)
     col = 0
     for feature in text:
-        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=14, height=2, padx=5)
+        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=20, height=2)
         feature_label.grid(row=row, column=col, pady=5)
         col += 1
     row += 1

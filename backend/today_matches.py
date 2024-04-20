@@ -75,7 +75,7 @@ def format_live_game_data(live_response):
     if live_match_count == 0:
         print("There are no live matches currently.")
     for match in live_response['response']:
-        formatted_data = [f"Q{match['periods']['current']}-{match['status']['clock']}",
+        formatted_data = [f"LIVE - Q{match['periods']['current']}-{match['status']['clock']}",
                           str(match['teams']['visitors']['name']),
                           match['scores']['visitors']['points'], 'vs.', match['scores']['home']['points'],
                           str(match['teams']['home']['name']), str(match['arena']['name']),
