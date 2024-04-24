@@ -7,6 +7,7 @@ from search_result import display_data
 from position import center
 from show_fav import show_favorites
 import today_matches
+from PIL import Image, ImageTk
 
 def call_team_data(team_code):
     url = "https://api-nba-v1.p.rapidapi.com/teams"
@@ -43,7 +44,9 @@ center(root)
 frame_1 = tk.Frame(root)
 frame_1.pack()
 
-home_logo = tk.Label(frame_1, text="LOGO")
+home_photo = ImageTk.PhotoImage(Image.open("home_logo.png").resize((50, 50)))
+home_logo = tk.Label(frame_1, image=home_photo)
+home_logo.image = home_photo
 home_logo.grid(row=0, column=0)
 
 search_entry = tk.Entry(frame_1, width=50, fg="gray", bd=1, relief="solid")
