@@ -100,8 +100,8 @@ def display_data(root, team):
 
     """Logo"""
     # Load the image from the URL
-    req.urlretrieve(team_info['logo'], "logo.png")
-    photo = ImageTk.PhotoImage(Image.open("logo.png").resize((100, 100)))
+    req.urlretrieve(team_info['logo'], "team_logo.png")
+    photo = ImageTk.PhotoImage(Image.open("team_logo.png").resize((100, 100)))
     
     # Display the image in the window
     logo = tk.Label(search_window, image=photo)
