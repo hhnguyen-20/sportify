@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox, scrolledtext
+from tkinter import ttk
 from PIL import Image, ImageTk
 import io
 import requests
@@ -14,14 +14,20 @@ def show_favorites(root):
     center(fav_window)
 
     outer_frame = tk.Frame(fav_window)
-    outer_frame.pack(expand=True, fill="both")
+    outer_frame.pack(expand=True, fill="both", padx=10, pady=10)
 
     if not favorite_teams:
         tk.Label(outer_frame, text="No favorite teams added yet.", pady=20).pack()
     else:
-        canvas = tk.Canvas(outer_frame, relief='flat', borderwidth=0)
+        canvas = tk.Canvas(outer_frame)
         scrollbar = tk.Scrollbar(outer_frame, orient="vertical", command=canvas.yview)
-        scrollable_frame = tk.Frame(canvas)
+        scrollable_frame = ttk.Frame(canvas)
+
+        canvas.config(yscrollcommand=scrollbar.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        canvas_frame = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
 
         scrollable_frame.bind(
             "<Configure>",
@@ -30,12 +36,6 @@ def show_favorites(root):
             )
         )
 
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="center")
-        canvas.configure(yscrollcommand=scrollbar.set)
-
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-
         # Create headers
         headers = ["Roll Number", "Logo", "Team Name", "Date Added"]
         header_font = ('Arial', 14, 'bold')
@@ -43,6 +43,7 @@ def show_favorites(root):
             label = tk.Label(scrollable_frame, text=header, font=header_font, borderwidth=2, relief="groove")
             label.grid(row=0, column=i, sticky='ew', ipadx=20, ipady=10)
 
+        # Display the data
         for index, team in enumerate(favorite_teams):
             roll_number, team_code, team_name, team_logo, date_added = team
 
@@ -63,11 +64,15 @@ def show_favorites(root):
             tk.Label(scrollable_frame, text=date_added, font=('Arial', 12)).grid(row=index + 1, column=3, sticky='ew',
                                                                                  ipadx=20, ipady=10)
 
+            # Separator after each team row
+            separator = ttk.Separator(scrollable_frame, orient='horizontal')
+            separator.grid(row=index + 2, column=0, columnspan=4, sticky='ew')
+
             def show_team_data(team_code=team_code):
                 display_data(root, call_team_data(team_code))
 
             # Adding a clickable event to the team name label
-            team_label = tk.Label(scrollable_frame, text=team_name, font=('Arial', 12, 'underline'), fg="yellow",
+            team_label = tk.Label(scrollable_frame, text=team_name, font=('Arial', 12, 'underline'), fg="red",
                                   cursor="hand2")
             team_label.grid(row=index + 1, column=2, sticky='ew', ipadx=20, ipady=10)
             team_label.bind("<Button-1>", lambda e, tc=team_code: show_team_data(tc))
