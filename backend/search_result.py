@@ -1,25 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-import urllib.request as req
 from PIL import Image, ImageTk
 import requests
 from position import center
-from api import API
+import io
+from api_functions import call_game_data, call_player_data
+import time
 
 favorite_teams = []  # Global list to store favorite teams
-
-
-def call_api_data(url, team_id, season):
-    """
-    Function to call the API data
-    """
-    querystring = {"team": str(team_id), "season": str(season)}
-    headers = {
-        "X-RapidAPI-Key": API,
-        "X-RapidAPI-Host": "api-nba-v1.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    return response.json()
 
 
 def create_table(parent, title, columns):
@@ -40,8 +28,8 @@ def create_table(parent, title, columns):
 def update_info(season_combobox, team_info, frame_game, frame_player):
     # Retrieve data
     season_selected = season_combobox.get()
-    game_data = call_api_data("https://api-nba-v1.p.rapidapi.com/games", team_info['id'], season_selected)
-    player_data = call_api_data("https://api-nba-v1.p.rapidapi.com/players", team_info['id'], season_selected)
+    game_data = call_game_data(team_info['id'], season_selected)
+    player_data = call_player_data(team_info['id'], season_selected)
 
     # Clear existing widgets
     for widget in frame_game.winfo_children() + frame_player.winfo_children():
@@ -61,6 +49,8 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
             f"{g['arena']['name']}, {g['arena']['city']}, {g['arena']['state']}"
         ))
 
+    time.sleep(5)  # add a sleep here to avoid the rate limit
+
     # Player information table with title
     player_columns = ('name', 'jersey', 'position', 'height (m)', 'weight (kg)')
     player_tree = create_table(
@@ -76,12 +66,29 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
         ))
 
 
-def add_to_favorites(team_id, team_name):
-    if team_id not in favorite_teams:
-        favorite_teams.append(team_name)
+def add_to_favorites(team_code, team_name, team_logo, current_date):
+    roll_number = len(favorite_teams) + 1
+    if team_code not in [team[1] for team in favorite_teams]:
+        favorite_teams.append((roll_number, team_code, team_name, team_logo, current_date))
         messagebox.showinfo("Success", f"{team_name} added to favorites!")
     else:
         messagebox.showinfo("Info", f"{team_name} is already in your favorites.")
+
+
+
+def display_team_logo(window, url):
+    """
+    Display the team logo in the window
+    """
+    response = requests.get(url)
+    image_bytes = io.BytesIO(response.content)
+    pil_image = Image.open(image_bytes)
+    pil_image = pil_image.resize((120, 120))
+    photo = ImageTk.PhotoImage(pil_image)
+
+    logo = tk.Label(window, image=photo)
+    logo.image = photo
+    logo.pack()
 
 
 def display_data(root, team):
@@ -92,14 +99,7 @@ def display_data(root, team):
     team_info = team['response'][0]
 
     """Logo"""
-    # Load the image from the URL
-    req.urlretrieve(team_info['logo'], "team_logo.png")
-    photo = ImageTk.PhotoImage(Image.open("team_logo.png").resize((120, 120)))
-
-    # Display the image in the window
-    logo = tk.Label(search_window, image=photo)
-    logo.image = photo
-    logo.pack()
+    display_team_logo(search_window, team_info['logo'])
 
     """Frame team"""
     frame_team = tk.Frame(search_window)
@@ -117,7 +117,12 @@ def display_data(root, team):
     )
     team_table.insert("", "end", values=team_data)
 
-    fav_button = tk.Button(frame_team, text="⭐️", command=lambda: add_to_favorites(team_info['id'], team_info['name']))
+    fav_button = tk.Button(frame_team, text="⭐️",
+                           command=lambda: add_to_favorites(
+                               team_info['code'],
+                               team_info['name'],
+                               team_info['logo'],
+                               time.strftime("%m/%d/%Y %H:%M:%S")))
     fav_button.pack(side="top", padx=5, pady=5)
 
     """Season"""
