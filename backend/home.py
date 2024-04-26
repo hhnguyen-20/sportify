@@ -1,23 +1,13 @@
 import threading
 import tkinter as tk
-import requests
-from api import API
 from tkinter import messagebox
 from search_result import display_data
 from position import center
 from show_fav import show_favorites
 import today_matches
 from PIL import Image, ImageTk
+from api_functions import call_team_data
 
-def call_team_data(team_code):
-    url = "https://api-nba-v1.p.rapidapi.com/teams"
-    querystring = {"code": team_code}
-    headers = {
-        "X-RapidAPI-Key": API,
-        "X-RapidAPI-Host": "api-nba-v1.p.rapidapi.com"
-    }
-    response = requests.get(url, headers=headers, params=querystring)
-    return response.json()
 
 def search():
     team_code = search_entry.get().strip().upper()  # Assuming the team code is entered and should be uppercase
@@ -28,6 +18,7 @@ def search():
         messagebox.showerror("showerror", "Error") 
     else:
         messagebox.showerror("showerror", "Error") 
+
 
 def show():
     threading.Thread(target=lambda: show_favorites(root)).start()
