@@ -91,11 +91,22 @@ for text in live_games:
     game_frame.pack()
 for text in today_games:
     game_frame = tk.Frame(frame_2, bg='white', bd=1, relief='solid')
-    col = 0
-    for feature in text:
-        feature_label = tk.Label(game_frame, text=feature, bg='white', fg='black', width=20, height=2)
-        feature_label.grid(row=row, column=col, pady=5)
-        col += 1
+    time_label = tk.Label(game_frame, text=text[0], bg='white', fg='black', width=15, height=2)
+    away_team_label = tk.Label(game_frame, text=text[1], bg='white', fg='black', width=20, height=2)
+    away_score_label = tk.Label(game_frame, text=text[2], bg='white', fg='black', width=5, height=2)
+    vs_label = tk.Label(game_frame, text=text[3], bg='white', fg='black', height=2)
+    home_score_label = tk.Label(game_frame, text=text[4], bg='white', fg='black', width=5, height=2)
+    home_team_label = tk.Label(game_frame, text=text[5], bg='white', fg='black', width=20, height=2)
+    arena_label = tk.Label(game_frame, text=text[6], bg='white', fg='black', width=20, height=2)
+    city_state_label = tk.Label(game_frame, text=text[7], bg='white', fg='black', width=15, height=2)
+    time_label.grid(row=row, column=0, pady=5)
+    away_team_label.grid(row=row, column=1, pady=5)
+    away_score_label.grid(row=row, column=2, pady=5)
+    vs_label.grid(row=row, column=3, pady=5)
+    home_score_label.grid(row=row, column=4, pady=5)
+    home_team_label.grid(row=row, column=5, pady=5)
+    arena_label.grid(row=row, column=6, pady=5)
+    city_state_label.grid(row=row, column=7, pady=5)
     row += 1
     game_frame.pack()
 # # displays today's live matches with scores
