@@ -8,6 +8,9 @@ from today_matches import call_game_data, format_today_game_data, format_live_ga
 from league_standings import call_standings, format_data
 from tkinter import ttk
 from PIL import Image, ImageTk
+from urllib.request import urlopen
+import requests
+from io import BytesIO
 from api_functions import call_team_data
 
 
@@ -85,22 +88,64 @@ for text in live_games+today_games:
     city_state_label.grid(row=row, column=7, pady=5)
     row += 1
     game_frame.pack()
+
 tk.Label(root, text="").pack()  # empty space
 
 """Frame 3"""
 frame_3 = tk.Frame(root, bd=1, relief="solid")
-frame_3.pack()
 
-def show_east():
-    pass
-
-def show_west():
-    pass
-
-# Displaying League Standing in frame 3
 east_standings, west_standings = call_standings()
 east_formatted = format_data(east_standings)
 west_formatted = format_data(west_standings)
+
+east_frame = tk.Frame(frame_3, bd=1, relief='solid')
+west_frame = tk.Frame(frame_3, bd=1, relief='solid')
+
+def load_image(image_url):
+    image_request = urlopen(image_url)
+    raw_image = Image.open(image_request)
+    raw_image.resize((2, 2))
+
+    final_image = ImageTk.PhotoImage(raw_image)
+    return final_image
+
+def show_east():
+    west_frame.pack_forget()
+    standing_row = 0
+    for rank, team in sorted(east_formatted.items()):
+        position = tk.Label(east_frame, text=rank, height=2, bg='white', fg='black')
+        team_logo = load_image(team[0])
+        logo_label = tk.Label(east_frame, bg='white', image=team_logo)
+        logo_label.image = team_logo
+        nickname_label = tk.Label(east_frame, text=team[1], width=5, height=2, bg='white', fg='black')
+        wins = tk.Label(east_frame, text=team[2], width=2, height=2, bg='white', fg='black')
+        losses = tk.Label(east_frame, text=team[3], width=2, height=2, bg='white', fg='black')
+        win_percent = tk.Label(east_frame, text=team[4], width=2, height=2, bg='white', fg='black')
+        games_behind = tk.Label(east_frame, text=team[5], width=2, height=2, bg='white', fg='black')
+        home_stat_label = tk.Label(east_frame, text=team[6], width=2, height=2, bg='white', fg='black')
+        away_stat_label = tk.Label(east_frame, text=team[7], width=2, height=2, bg='white', fg='black')
+        last_ten_stat_label = tk.Label(east_frame, text=team[8], width=2, height=2, bg='white', fg='black')
+        streak_label = tk.Label(east_frame, text=team[9], width=2, height=2, bg='white', fg='black')
+        position.grid(row=standing_row, column=0, pady=5)
+        logo_label.grid(row=standing_row, column=1, pady=5)
+        nickname_label.grid(row=standing_row, column=2, pady=5)
+        wins.grid(row=standing_row, column=3, pady=5)
+        losses.grid(row=standing_row, column=4, pady=5)
+        win_percent.grid(row=standing_row, column=5, pady=5)
+        games_behind.grid(row=standing_row, column=6, pady=5)
+        home_stat_label.grid(row=standing_row, column=7, pady=5)
+        away_stat_label.grid(row=standing_row, column=8, pady=5)
+        last_ten_stat_label.grid(row=standing_row, column=9, pady=5)
+        streak_label.grid(row=standing_row, column=9, pady=5)
+        standing_row += 1
+    east_frame.pack()
+
+
+def show_west():
+    east_frame.pack_forget()
+
+
+# Displaying League Standing in frame 3
 button_frame = tk.Frame(frame_3)
 east_button = tk.Button(button_frame, text='EAST', command=show_east)
 east_button.grid(column=0, row=0)
@@ -112,5 +157,7 @@ west_button.grid(column=2, row=0)
 # league_standing.pack()
 button_frame.pack()
 frame_3.pack()
+button_frame.mainloop()
+frame_3.mainloop()
 # Run the Tkinter event loop
 root.mainloop()
