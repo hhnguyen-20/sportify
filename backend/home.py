@@ -1,6 +1,9 @@
 import threading
 import tkinter as tk
 from tkinter import messagebox
+
+import PIL.Image
+
 from search_result import display_data
 from position import center
 from show_fav import show_favorites
@@ -98,51 +101,103 @@ east_standings, west_standings = call_standings()
 east_formatted = format_data(east_standings)
 west_formatted = format_data(west_standings)
 
-east_frame = tk.Frame(frame_3, bd=1, relief='solid')
-west_frame = tk.Frame(frame_3, bd=1, relief='solid')
+east_frame = tk.Frame(frame_3, bg='white', bd=1, relief='solid')
+west_frame = tk.Frame(frame_3, bg='white', bd=1, relief='solid')
+
 
 def load_image(image_url):
     image_request = urlopen(image_url)
     raw_image = Image.open(image_request)
-    raw_image.resize((2, 2))
+    resized_raw = raw_image.resize((40, 40), PIL.Image.Resampling.LANCZOS)
+    final_image = ImageTk.PhotoImage(resized_raw)
 
-    final_image = ImageTk.PhotoImage(raw_image)
     return final_image
+
+
+def standing_labels(conf_frame):
+    team_header = tk.Label(conf_frame, text="Team", width=5, height=2, bg='white', fg='black')
+    win_header = tk.Label(conf_frame, text="W", width=5, height=2, bg='white', fg='black')
+    loss_header = tk.Label(conf_frame, text="L", width=5, height=2, bg='white', fg='black')
+    pct_header = tk.Label(conf_frame, text="Pct", width=5, height=2, bg='white', fg='black')
+    gb_header = tk.Label(conf_frame, text="GB", width=5, height=2, bg='white', fg='black')
+    home_header = tk.Label(conf_frame, text="Home", width=5, height=2, bg='white', fg='black')
+    away_header = tk.Label(conf_frame, text="Away", width=5, height=2, bg='white', fg='black')
+    streak_header = tk.Label(conf_frame, text="Strk", width=5, height=2, bg='white', fg='black')
+    header_row = 0
+    team_header.grid(row=header_row, column=0, columnspan=3)
+    win_header.grid(row=header_row, column=3)
+    loss_header.grid(row=header_row, column=4)
+    pct_header.grid(row=header_row, column=5)
+    gb_header.grid(row=header_row, column=6)
+    home_header.grid(row=header_row, column=7)
+    away_header.grid(row=header_row, column=8)
+    streak_header.grid(row=header_row, column=9)
+
 
 def show_east():
     west_frame.pack_forget()
-    standing_row = 0
+    standing_labels(east_frame)
+    standing_row = 1
     for rank, team in sorted(east_formatted.items()):
-        position = tk.Label(east_frame, text=rank, height=2, bg='white', fg='black')
+        position = tk.Label(east_frame, text=rank, width=5, height=2, bg='white', fg='black')
         team_logo = load_image(team[0])
         logo_label = tk.Label(east_frame, bg='white', image=team_logo)
         logo_label.image = team_logo
-        nickname_label = tk.Label(east_frame, text=team[1], width=5, height=2, bg='white', fg='black')
-        wins = tk.Label(east_frame, text=team[2], width=2, height=2, bg='white', fg='black')
-        losses = tk.Label(east_frame, text=team[3], width=2, height=2, bg='white', fg='black')
-        win_percent = tk.Label(east_frame, text=team[4], width=2, height=2, bg='white', fg='black')
-        games_behind = tk.Label(east_frame, text=team[5], width=2, height=2, bg='white', fg='black')
-        home_stat_label = tk.Label(east_frame, text=team[6], width=2, height=2, bg='white', fg='black')
-        away_stat_label = tk.Label(east_frame, text=team[7], width=2, height=2, bg='white', fg='black')
-        last_ten_stat_label = tk.Label(east_frame, text=team[8], width=2, height=2, bg='white', fg='black')
-        streak_label = tk.Label(east_frame, text=team[9], width=2, height=2, bg='white', fg='black')
-        position.grid(row=standing_row, column=0, pady=5)
-        logo_label.grid(row=standing_row, column=1, pady=5)
-        nickname_label.grid(row=standing_row, column=2, pady=5)
-        wins.grid(row=standing_row, column=3, pady=5)
-        losses.grid(row=standing_row, column=4, pady=5)
-        win_percent.grid(row=standing_row, column=5, pady=5)
-        games_behind.grid(row=standing_row, column=6, pady=5)
-        home_stat_label.grid(row=standing_row, column=7, pady=5)
-        away_stat_label.grid(row=standing_row, column=8, pady=5)
-        last_ten_stat_label.grid(row=standing_row, column=9, pady=5)
-        streak_label.grid(row=standing_row, column=9, pady=5)
+        nickname_label = tk.Label(east_frame, text=team[1], width=10, height=2, bg='white', fg='black')
+        wins = tk.Label(east_frame, text=team[2], width=5, height=2, bg='white', fg='black')
+        losses = tk.Label(east_frame, text=team[3], width=5, height=2, bg='white', fg='black')
+        win_percent = tk.Label(east_frame, text=team[4], width=5, height=2, bg='white', fg='black')
+        games_behind = tk.Label(east_frame, text=team[5], width=5, height=2, bg='white', fg='black')
+        home_stat_label = tk.Label(east_frame, text=team[6], width=5, height=2, bg='white', fg='black')
+        away_stat_label = tk.Label(east_frame, text=team[7], width=5, height=2, bg='white', fg='black')
+        last_ten_stat_label = tk.Label(east_frame, text=team[8], width=5, height=2, bg='white', fg='black')
+        streak_label = tk.Label(east_frame, text=team[9], width=5, height=2, bg='white', fg='black')
+        position.grid(row=standing_row, column=0, pady=1)
+        logo_label.grid(row=standing_row, column=1, pady=1)
+        nickname_label.grid(row=standing_row, column=2, pady=1)
+        wins.grid(row=standing_row, column=3, pady=1)
+        losses.grid(row=standing_row, column=4, pady=1)
+        win_percent.grid(row=standing_row, column=5, pady=1)
+        games_behind.grid(row=standing_row, column=6, pady=1)
+        home_stat_label.grid(row=standing_row, column=7, pady=1)
+        away_stat_label.grid(row=standing_row, column=8, pady=1)
+        last_ten_stat_label.grid(row=standing_row, column=9, pady=1)
+        streak_label.grid(row=standing_row, column=9, pady=1)
         standing_row += 1
     east_frame.pack()
 
 
 def show_west():
     east_frame.pack_forget()
+    standing_labels(west_frame)
+    standing_row = 1
+    for rank, team in sorted(west_formatted.items()):
+        position = tk.Label(west_frame, text=rank, width=5, height=2, bg='white', fg='black')
+        team_logo = load_image(team[0])
+        logo_label = tk.Label(west_frame, bg='white', image=team_logo)
+        logo_label.image = team_logo
+        nickname_label = tk.Label(west_frame, text=team[1], width=10, height=2, bg='white', fg='black')
+        wins = tk.Label(west_frame, text=team[2], width=5, height=2, bg='white', fg='black')
+        losses = tk.Label(west_frame, text=team[3], width=5, height=2, bg='white', fg='black')
+        win_percent = tk.Label(west_frame, text=team[4], width=5, height=2, bg='white', fg='black')
+        games_behind = tk.Label(west_frame, text=team[5], width=5, height=2, bg='white', fg='black')
+        home_stat_label = tk.Label(west_frame, text=team[6], width=5, height=2, bg='white', fg='black')
+        away_stat_label = tk.Label(west_frame, text=team[7], width=5, height=2, bg='white', fg='black')
+        last_ten_stat_label = tk.Label(west_frame, text=team[8], width=5, height=2, bg='white', fg='black')
+        streak_label = tk.Label(west_frame, text=team[9], width=5, height=2, bg='white', fg='black')
+        position.grid(row=standing_row, column=0, pady=1)
+        logo_label.grid(row=standing_row, column=1, pady=1)
+        nickname_label.grid(row=standing_row, column=2, pady=1)
+        wins.grid(row=standing_row, column=3, pady=1)
+        losses.grid(row=standing_row, column=4, pady=1)
+        win_percent.grid(row=standing_row, column=5, pady=1)
+        games_behind.grid(row=standing_row, column=6, pady=1)
+        home_stat_label.grid(row=standing_row, column=7, pady=1)
+        away_stat_label.grid(row=standing_row, column=8, pady=1)
+        last_ten_stat_label.grid(row=standing_row, column=9, pady=1)
+        streak_label.grid(row=standing_row, column=9, pady=1)
+        standing_row += 1
+    west_frame.pack()
 
 
 # Displaying League Standing in frame 3
