@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
+from urllib.request import urlopen
+
+import PIL
 from PIL import Image, ImageTk
-import requests
 from position import center
-import io
 from api_functions import call_game_data, call_player_data
 import time
 
@@ -75,19 +76,17 @@ def add_to_favorites(team_code, team_name, team_logo, current_date):
         messagebox.showinfo("Info", f"{team_name} is already in your favorites.")
 
 
-
 def display_team_logo(window, url):
     """
     Display the team logo in the window
     """
-    response = requests.get(url)
-    image_bytes = io.BytesIO(response.content)
-    pil_image = Image.open(image_bytes)
-    pil_image = pil_image.resize((120, 120))
-    photo = ImageTk.PhotoImage(pil_image)
+    image_request = urlopen(url)
+    raw_image = Image.open(image_request)
+    resized_raw = raw_image.resize((120, 120), PIL.Image.Resampling.LANCZOS)
+    final_image = ImageTk.PhotoImage(resized_raw)
 
-    logo = tk.Label(window, image=photo)
-    logo.image = photo
+    logo = tk.Label(window, image=final_image)
+    logo.image = final_image
     logo.pack()
 
 
