@@ -12,8 +12,6 @@ from league_standings import call_standings, format_data
 from tkinter import ttk
 from PIL import Image, ImageTk
 from urllib.request import urlopen
-import requests
-from io import BytesIO
 from api_functions import call_team_data
 
 

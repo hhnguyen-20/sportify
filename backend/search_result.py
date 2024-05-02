@@ -40,12 +40,12 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
     game_tree = create_table(
         frame_game, "Recent Games", game_columns
     )
-    for g in game_data['response'][:10]:
+    for g in game_data['response'][-10::]:
         game_tree.insert("", "end", values=(
-            g['date']['start'][:10],
-            g['teams']['visitors']['name'],
+            g['date']['start'][:10] if g['date']['start'] else "-",
+            g['teams']['visitors']['name'] if g['teams']['visitors']['name'] else "-",
             f"{g['scores']['visitors']['points']} - {g['scores']['home']['points']}",
-            g['teams']['home']['name'],
+            g['teams']['home']['name'] if g['teams']['home']['name'] else "-",
             f"{g['arena']['name']}, {g['arena']['city']}, {g['arena']['state']}"
         ))
 
@@ -56,13 +56,13 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
     player_tree = create_table(
         frame_player, "Team Players", player_columns
     )
-    for p in player_data['response'][:10]:
+    for p in player_data['response'][:]:
         player_tree.insert("", "end", values=(
             f"{p['firstname']} {p['lastname']}",
-            p['leagues']['standard']['jersey'],
-            p['leagues']['standard']['pos'],
-            p['height']['meters'],
-            p['weight']['kilograms']
+            p['leagues']['standard']['jersey'] if p['leagues']['standard']['jersey'] else "-",
+            p['leagues']['standard']['pos'] if p['leagues']['standard']['pos'] else "-",
+            p['height']['meters'] if p['height']['meters'] else "-",
+            p['weight']['kilograms'] if p['weight']['kilograms'] else "-",
         ))
 
 
