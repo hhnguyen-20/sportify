@@ -20,10 +20,6 @@ teams_data['response'].extend(west_teams_data['response'])
 
 team_names = {team['name']: team['id'] for team in teams_data['response']}
 
-i = 1
-for team in team_names:
-    print(str(i) + " " + team)
-    i += 1
 
 def search():
     team_search = search_entry.get().strip()
