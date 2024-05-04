@@ -7,8 +7,9 @@ headers = {
     }
 
 
-def call_team_name():
-    response = requests.get("https://api-nba-v1.p.rapidapi.com/teams", headers=headers)
+def call_team_name(conference):
+    querystring = {"league":"standard", "conference": conference}
+    response = requests.get("https://api-nba-v1.p.rapidapi.com/teams", headers=headers, params=querystring)
     return response.json()
 
 

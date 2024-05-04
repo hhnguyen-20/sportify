@@ -12,9 +12,18 @@ from PIL import Image, ImageTk
 from urllib.request import urlopen
 from api_functions import call_team_name, call_team_data
 
-teams_data = call_team_name()
+east_teams_data = call_team_name("east")
+west_teams_data = call_team_name("west")
+
+teams_data = east_teams_data
+teams_data['response'].extend(west_teams_data['response'])
+
 team_names = {team['name']: team['id'] for team in teams_data['response']}
 
+i = 1
+for team in team_names:
+    print(str(i) + " " + team)
+    i += 1
 
 def search():
     team_search = search_entry.get().strip()
