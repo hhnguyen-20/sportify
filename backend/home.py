@@ -1,9 +1,7 @@
 import threading
 import tkinter as tk
 from tkinter import messagebox
-
 import PIL.Image
-
 from search_result import display_data
 from position import center
 from show_fav import show_favorites
@@ -12,30 +10,36 @@ from league_standings import call_standings, format_data
 from tkinter import ttk
 from PIL import Image, ImageTk
 from urllib.request import urlopen
-from api_functions import call_team_data
+from api_functions import call_team_name, call_team_data
+
+teams_data = call_team_name()
+team_names = {team['name']: team['id'] for team in teams_data['response']}
 
 
 def search():
-    team_code = search_entry.get().strip().upper()  # Assuming the team code is entered and should be uppercase
-    if team_code:  # Check if the entry is not empty
-        # Run the API call and data display in a separate thread to avoid freezing the GUI
-        threading.Thread(target=lambda: display_data(root, call_team_data(team_code))).start()
-    elif team_code == "Enter a team name...":
-        messagebox.showerror("showerror", "Error") 
+    team_search = search_entry.get().strip()
+    if team_search in team_names:
+        team_id = team_names.get(team_search)
+        threading.Thread(target=lambda: display_data(root, call_team_data(team_id))).start()
     else:
-        messagebox.showerror("showerror", "Error") 
+        messagebox.showerror("showerror", "Error: Invalid team name")
 
 
 def show():
     threading.Thread(target=lambda: show_favorites(root)).start()
-    
+
+
+def update_dropdown(event):
+    search_term = search_entry.get().lower()
+    filtered_teams = [name for name in team_names.keys() if search_term in name.lower()]
+    search_entry['values'] = filtered_teams
+    search_entry.event_generate('<Down>')
+
 
 # Create a Tkinter window
 root = tk.Tk()
 root.title("Home")
-
-# center the root
-center(root)
+center(root)  # center the root
 
 """Frame 1"""
 frame_1 = tk.Frame(root)
@@ -46,9 +50,10 @@ home_logo = tk.Label(frame_1, image=home_photo)
 home_logo.image = home_photo
 home_logo.grid(row=0, column=0)
 
-search_entry = tk.Entry(frame_1, width=50, fg="gray", bd=1, relief="solid")
-search_entry.insert(0, "Enter a team name...")
-search_entry.bind("<FocusIn>", lambda event: search_entry.delete(0, "end"))
+search_entry = ttk.Combobox(frame_1, values=list(team_names.keys()), width=50, foreground="gray")
+search_entry.set("Enter a team name...")
+search_entry.bind("<FocusIn>", lambda event: search_entry.set('') if search_entry.get() == "Enter a team name..." else None)
+search_entry.bind("<KeyRelease>", update_dropdown)
 search_entry.grid(row=0, column=1)
 
 search_button = tk.Button(frame_1, text="Search", command=search)

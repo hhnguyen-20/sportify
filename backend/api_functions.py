@@ -7,8 +7,13 @@ headers = {
     }
 
 
-def call_team_data(team_code):
-    querystring = {"code": team_code}
+def call_team_name():
+    response = requests.get("https://api-nba-v1.p.rapidapi.com/teams", headers=headers)
+    return response.json()
+
+
+def call_team_data(team_id):
+    querystring = {"id": team_id}
     response = requests.get("https://api-nba-v1.p.rapidapi.com/teams", headers=headers, params=querystring)
     return response.json()
 
