@@ -4,6 +4,10 @@ from datetime import date
 
 
 def call_game_data():
+    """
+    Calls API data to get all live games and today's games
+    :return: The API response for live games and today's games in json format
+    """
     url = "https://api-nba-v1.p.rapidapi.com/games"
     today = str(date.today())
     today_querystring = {'date': today}
@@ -18,6 +22,11 @@ def call_game_data():
 
 
 def format_live_game_data(live_response):
+    """
+    Formats the json response by extracting important information and putting them into a list
+    :param live_response: The json response for live game data
+    :return: The list of formatted live matches
+    """
     live_match_count = live_response['results']
     formatted_live_matches = []
     if live_match_count == 0:
@@ -33,6 +42,11 @@ def format_live_game_data(live_response):
 
 
 def format_today_game_data(today_response):
+    """
+    Formats the json response by extracting important information and putting them into a list
+    :param today_response: The json response for today's games
+    :return: The list of formatted today matches
+    """
     today_match_count = today_response['results']
     formatted_today_matches = []
     if today_match_count == 0:
@@ -46,13 +60,3 @@ def format_today_game_data(today_response):
                           f"{str(match['arena']['city'])}, {str(match['arena']['state'])}"]
         formatted_today_matches.append(formatted_data)
     return formatted_today_matches
-
-
-def main():
-    today_games_json, live_games_json = call_game_data()
-    live_matches = format_live_game_data(live_games_json)
-    today_matches = format_today_game_data(today_games_json)
-
-
-if __name__ == '__main__':
-    main()

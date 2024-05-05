@@ -9,6 +9,11 @@ from search_result import favorite_teams, display_data
 
 
 def show_favorites(root):
+    """
+    Creates a Favorite Teams List in the frontend
+    :param root: The main app TK window
+    :return: None
+    """
     fav_window = tk.Toplevel(root)
     fav_window.title("Favorite Teams")
     center(fav_window)
@@ -69,6 +74,11 @@ def show_favorites(root):
             separator.grid(row=index + 2, column=0, columnspan=4, sticky='ew')
 
             def show_team_data(team_code=team_code):
+                """
+                Helper method that displays teams data based on team code
+                :param team_code: The team code to display data
+                :return: None
+                """
                 display_data(root, call_team_data(team_code))
 
             # Adding a clickable event to the team name label

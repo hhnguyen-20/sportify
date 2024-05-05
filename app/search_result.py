@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 from urllib.request import urlopen
-
 import PIL
 from PIL import Image, ImageTk
 from position import center
@@ -12,6 +11,13 @@ favorite_teams = []  # Global list to store favorite teams
 
 
 def create_table(parent, title, columns):
+    """
+    Helper method to create tables for the team's data
+    :param parent: The parent frame
+    :param title: The title of the table
+    :param columns: The tuple of columns of table
+    :return: Tk Table
+    """
     frame = tk.Frame(parent, bd=1, relief="solid")
     frame.pack(side="top", fill="x", padx=10, pady=5)
 
@@ -27,6 +33,14 @@ def create_table(parent, title, columns):
 
 
 def update_info(season_combobox, team_info, frame_game, frame_player):
+    """
+    Helper method that displays team data
+    :param season_combobox: The combobox in Tk
+    :param team_info: Team information
+    :param frame_game: The frame that display game information about a certain team
+    :param frame_player: The frame that display player information about a certain team
+    :return: None
+    """
     # Retrieve data
     season_selected = season_combobox.get()
     game_data = call_game_data(team_info['id'], season_selected)
@@ -68,6 +82,14 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
 
 
 def add_to_favorites(team_code, team_name, team_logo, current_date):
+    """
+    Adds certain team into the Favorites Team list
+    :param team_code: The team code
+    :param team_name: The name of the team
+    :param team_logo: The url of the logo of the team
+    :param current_date: Added date
+    :return: None
+    """
     roll_number = len(favorite_teams) + 1
     if team_code not in [team[1] for team in favorite_teams]:
         favorite_teams.append((roll_number, team_code, team_name, team_logo, current_date))
@@ -91,6 +113,12 @@ def display_team_logo(window, url):
 
 
 def display_data(root, team):
+    """
+    Displays searched team's data
+    :param root: The main app window
+    :param team: The searched team
+    :return: None
+    """
     search_window = tk.Toplevel(root)
     search_window.title("Team Data")
     center(search_window)

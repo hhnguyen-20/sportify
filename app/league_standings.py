@@ -4,6 +4,10 @@ import pprint
 
 
 def call_standings():
+    """
+    Calls API data to get the league standings
+    :return: The API response for east conference and west conference standings in json format
+    """
     url = "https://api-nba-v1.p.rapidapi.com/standings"
     east_querystring = {'league': 'standard', 'season': '2023', 'conference': 'east'}
     west_querystring = {'league': 'standard', 'season': '2023', 'conference': 'west'}
@@ -17,6 +21,11 @@ def call_standings():
 
 
 def format_data(conf_json):
+    """
+    Formats the json response by extracting important information and putting them into a list
+    :param conf_json: The conference json response
+    :return: The list of formatted conference standing data
+    """
     team_standing_dict = {}
     for team in conf_json['response']:
         last_10_stat = f"{team['win']['lastTen']}-{team['loss']['lastTen']}"
@@ -35,18 +44,3 @@ def format_data(conf_json):
                                                           team['conference']['loss'], team['win']['percentage'],
                                                           games_behind, home_stat, away_stat, last_10_stat, streak]
     return team_standing_dict
-
-
-def main():
-    east_conf_data, west_conf_data = call_standings()
-    east_standing_dict = format_data(east_conf_data)
-    west_standing_dict = format_data(west_conf_data)
-    print("East Conference")
-    pprint.pprint(east_standing_dict)
-    print("------------------------------------------------------------")
-    print("West Conference")
-    pprint.pprint(west_standing_dict)
-
-
-if __name__ == '__main__':
-    main()

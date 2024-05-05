@@ -1,4 +1,9 @@
 def center(root):
+    """
+    Centers elements in the home page to the center
+    :param root: The app home page window
+    :return: None
+    """
     window_width = 1500
     window_height = 1200
     screen_width = root.winfo_screenwidth()
