@@ -1,9 +1,4 @@
-import tkinter as tk
-from tkinter import ttk
-from PIL import Image, ImageTk
-from io import BytesIO
 import requests
-from position import center
 from api import API
 import pprint
 
@@ -22,35 +17,6 @@ def call_standings():
 
 
 def format_data(conf_json):
-    '''
-    {'conference': {'loss': 17, 'name': 'east', 'rank': 1, 'win': 62},
-     'division': {'gamesBehind': None,
-                    'loss': 17,
-                    'name': 'atlantic',
-                    'rank': 1,
-                    'win': 62},
-     'gamesBehind': None,
-     'league': 'standard',
-     'loss': {'away': 14,
-                'home': 3,
-                'lastTen': 3,
-                'percentage': '0.215',
-                'total': 17},
-     'season': 2023,
-     'streak': 1,
-     'team': {'code': 'BOS',
-                'id': 2,
-                'logo': 'https://upload.wikimedia.org/wikipedia/fr/thumb/6/65/Celtics_de_Boston_logo.svg/1024px-Celtics_de_Boston_logo.svg.png',
-                'name': 'Boston Celtics',
-                'nickname': 'Celtics'},
-     'tieBreakerPoints': None,
-     'win': {'away': 27,
-               'home': 35,
-               'lastTen': 7,
-               'percentage': '0.785',
-               'total': 62},
-     'winStreak': False}
-    '''
     team_standing_dict = {}
     for team in conf_json['response']:
         last_10_stat = f"{team['win']['lastTen']}-{team['loss']['lastTen']}"
