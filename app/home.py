@@ -42,7 +42,7 @@ def show():
     threading.Thread(target=lambda: show_favorites(root)).start()
 
 
-def update_dropdown():
+def update_dropdown(event):
     """
     Helper method that updates the dropdown menu based on user input in the search bar
     :return: None
