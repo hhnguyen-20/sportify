@@ -5,20 +5,19 @@ import PIL.Image
 from search_result import display_data
 from position import center
 from show_fav import show_favorites
-from today_matches import call_game_data, format_today_game_data, format_live_game_data
-from league_standings import call_standings, format_data
+from today_matches import format_today_game_data, format_live_game_data
+from league_standings import format_data
 from tkinter import ttk
 from PIL import Image, ImageTk
 from urllib.request import urlopen
-from api_functions import call_team_name, call_team_data
+from api_functions import call_team_name, call_team_data, call_live_game_data, call_standings
+from urllib.error import HTTPError
 
 east_teams_data = call_team_name("east")
 west_teams_data = call_team_name("west")
+teams_data = {**east_teams_data, **west_teams_data}
 
-teams_data = east_teams_data
-teams_data['response'].extend(west_teams_data['response'])
-
-team_names = {team['name']: team['id'] for team in teams_data['response']}
+team_names = {team['name']: team['id'] for team in teams_data.get('response')}
 
 
 def search():
@@ -63,7 +62,11 @@ frame_1 = tk.Frame(root)
 frame_1.pack()
 
 # App logo
-home_photo = ImageTk.PhotoImage(Image.open("home_logo.png").resize((50, 50)))
+image_request = urlopen(
+    "https://img.freepik.com/free-vector/hand-drawn-flat-design-basketball-logo_23-2149392459.jpg")
+raw_image = Image.open(image_request)
+resized_raw = raw_image.resize((50, 50), PIL.Image.Resampling.LANCZOS)
+home_photo = ImageTk.PhotoImage(resized_raw)
 home_logo = tk.Label(frame_1, image=home_photo)
 home_logo.image = home_photo
 home_logo.grid(row=0, column=0)
@@ -71,7 +74,8 @@ home_logo.grid(row=0, column=0)
 # Search bar
 search_entry = ttk.Combobox(frame_1, values=list(team_names.keys()), width=50, foreground="gray")
 search_entry.set("Enter a team name...")
-search_entry.bind("<FocusIn>", lambda event: search_entry.set('') if search_entry.get() == "Enter a team name..." else None)
+search_entry.bind("<FocusIn>",
+                  lambda event: search_entry.set('') if search_entry.get() == "Enter a team name..." else None)
 search_entry.bind("<KeyRelease>", update_dropdown)
 search_entry.grid(row=0, column=1)
 
@@ -86,13 +90,13 @@ fav_button.grid(row=0, column=3)
 tk.Label(root, text="").pack()  # empty space
 
 """Frame 2: List of live games and today's games in UTC time format"""
-today_json, live_json = call_game_data()
+today_json, live_json = call_live_game_data()
 live_games = format_live_game_data(live_json)
 today_games = format_today_game_data(today_json)
 frame_2 = tk.Frame(root, bd=1, relief="solid")
 frame_2.pack()
 row = 0
-for text in live_games+today_games:
+for text in live_games + today_games:
     game_frame = tk.Frame(frame_2, bg='white', bd=1, relief='solid')
     if not text[0].find("LIVE"):
         time_label = tk.Label(game_frame, text=text[0], bg='white', fg='red', width=15, height=2)
@@ -135,10 +139,17 @@ def load_image(image_url):
     :param image_url: The url for the image
     :return: Rendered image
     """
-    image_request = urlopen(image_url)
-    raw_image = Image.open(image_request)
-    resized_raw = raw_image.resize((35, 35), PIL.Image.Resampling.LANCZOS)
-    final_image = ImageTk.PhotoImage(resized_raw)
+    try:
+        request = urlopen(image_url)
+    except HTTPError:
+        image_url = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png"
+        request = urlopen(image_url)
+
+    image = Image.open(request)
+
+    raw = image.resize((35, 35), PIL.Image.Resampling.LANCZOS)
+    final_image = ImageTk.PhotoImage(raw)
+
     return final_image
 
 
@@ -202,6 +213,7 @@ def create_league_standing(conf_frame, formatted_conf):
         streak_label.grid(row=standing_row, column=9, pady=1)
         standing_row += 1
 
+
 def show_east():
     """
     Creates the East conference standing
@@ -237,5 +249,6 @@ button_frame.pack()
 frame_3.pack()
 button_frame.mainloop()
 frame_3.mainloop()
+
 # Run the Tkinter event loop
 root.mainloop()

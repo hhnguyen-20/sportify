@@ -6,6 +6,7 @@ from PIL import Image, ImageTk
 from position import center
 from api_functions import call_game_data, call_player_data
 import time
+from urllib.error import HTTPError
 
 favorite_teams = []  # Global list to store favorite teams
 
@@ -64,7 +65,7 @@ def update_info(season_combobox, team_info, frame_game, frame_player):
             f"{g['arena']['name']}, {g['arena']['city']}, {g['arena']['state']}"
         ))
 
-    time.sleep(5)  # add a sleep here to avoid the rate limit
+    # time.sleep(5)  # add a sleep here to avoid the rate limit
 
     # Player information table with title
     player_columns = ('name', 'jersey', 'position', 'height (m)', 'weight (kg)')
@@ -102,10 +103,16 @@ def display_team_logo(window, url):
     """
     Display the team logo in the window
     """
-    image_request = urlopen(url)
-    raw_image = Image.open(image_request)
-    resized_raw = raw_image.resize((120, 120), PIL.Image.Resampling.LANCZOS)
-    final_image = ImageTk.PhotoImage(resized_raw)
+    try:
+        request = urlopen(url)
+    except HTTPError:
+        url = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/No_image_available.svg/600px-No_image_available.svg.png"
+        request = urlopen(url)
+
+    image = Image.open(request)
+
+    raw = image.resize((120, 120), PIL.Image.Resampling.LANCZOS)
+    final_image = ImageTk.PhotoImage(raw)
 
     logo = tk.Label(window, image=final_image)
     logo.image = final_image
@@ -144,7 +151,8 @@ def display_data(root, team):
     )
     team_table.insert("", "end", values=team_data)
 
-    fav_button = tk.Button(frame_team, text="⭐️",
+    fav_button = tk.Button(frame_team,
+                           text="⭐ Add to Favorites",
                            command=lambda: add_to_favorites(
                                team_info['code'],
                                team_info['name'],

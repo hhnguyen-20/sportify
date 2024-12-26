@@ -1,45 +1,52 @@
-# cs122-Sportify 
+# Sportify APP
 
-## Create a virtual environment
-- Create a virtual environment in the root directory of the project:<br>
-```terminal
+This is a simple Python application built with Tkinter that allows you to search for NBA teams and players. The
+application uses the API-NBA to get the data.
+
+## How to Run
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/hhnguyen-20/sportify.git
+cd sportify
+```
+
+2. Create a virtual environment and install the dependencies:
+
+```bash
 python -m venv .venv
-```
-
-- Activate the virtual environment:<br>
-```terminal
 source .venv/bin/activate
-```
-
-## Install all libraries
-- Install all libraries listed in the requirements.txt file:<br>
-```terminal
 pip install -r requirements.txt
 ```
 
-## Run the program
-- Make sure go to the app folder:<br>
-```terminal
-cd app
-```
+3. Add the [API-NBA key](https://api-sports.io) to the headers of the api_functions.py file:
 
-- Make sure API in api.py is not commented out:<br>
-```python
-API = "YOUR_API_KEY"
-```
+`
+headers = {
+    'x-rapidapi-host': "v2.nba.api-sports.io",
+    'x-rapidapi-key': "xxxxxxxxxxxxxxxxxxxxxx"
+}
+`
 
-- Run the program:<br>
-```terminal
+4. Run the app:
+
+```bash
 python home.py
 ```
 
-## Dependencies
-- python==3.8+
-- certifi==2024.2.2
-- charset-normalizer==3.3.2
-- idna==3.7
-- pillow==10.3.0
-- requests==2.31.0
-- tk==0.1.0
-- urllib3==2.2.1
-- APIs from https://rapidapi.com/api-sports/api/api-nba
+## Create Executables
+
+- Install PyInstaller:
+
+```bash
+pip install pyinstaller
+```
+
+- Create the executable:
+
+```bash
+pyinstaller --onefile --windowed home.py
+```
+
+- The executable will be in the `dist` folder.
